@@ -20,7 +20,6 @@ export default () => {
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>(null)
   const [isStickDown, setStickDown] = createSignal(false)
-  const [isStickUp, setStickUp] = createSignal(false)
   // const [backgroundColor, setBackgroundColor] = createSignal(false)
 
   createEffect(() => (isStickDown() && smoothToBottom()))
@@ -219,7 +218,9 @@ export default () => {
     <div my-6>
       {/* <SetThme backgroundColor={backgroundColor} setBackgroundColor={setBackgroundColor} /> */}
       <Button variant="outlined" style={{ width: '100%', height: '100px' }} {...btnProps}>
-        Intro
+        <span>
+          使用须知
+        </span>
       </Button>
       <SystemRoleSettings
         canEdit={() => messageList().length === 0}
@@ -249,7 +250,7 @@ export default () => {
         when={!loading()}
         fallback={() => (
           <div class="gen-cb-wrapper">
-            <span>AI is thinking...</span>
+            <span>AI思考中...</span>
             <div class="gen-cb-stop" onClick={stopStreamFetch}>Stop</div>
           </div>
         )}
@@ -259,7 +260,7 @@ export default () => {
             ref={inputRef!}
             disabled={systemRoleEditing()}
             onKeyDown={handleKeydown}
-            placeholder="Enter something..."
+            placeholder="和ChatGPT聊天"
             autocomplete="off"
             autofocus
             onInput={() => {
@@ -269,9 +270,10 @@ export default () => {
             rows="1"
             class="gen-textarea"
           />
-          <button onClick={handleButtonClick} disabled={systemRoleEditing()} gen-slate-btn>
-            Send
+          <button onClick={handleButtonClick} disabled={systemRoleEditing()} gen-slate-btn style={{ 'white-space': 'nowrap' }}>
+            发送
           </button>
+          {/* <Button {...{ variant: 'outlined', style: { 'border': 'none', 'background-color': 'rgba(148,163,184,0.15)' } }}>发送</Button> */}
           <button title="Clear" onClick={clear} disabled={systemRoleEditing()} gen-slate-btn>
             <IconClear />
           </button>
