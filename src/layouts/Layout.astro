@@ -35,14 +35,25 @@ const { title } = Astro.props;
     <!-- netlify-disable-end -->
   </head>
   <body>
-    <slot />
+    <div id="bgc-texture">
+      <slot />
+    </div>
   </body>
 </html>
 
+<script>
+
+</script>
+
 <style is:global>
+  #bgc-texture {
+    width:100%;
+    min-height:100vh;
+    background-image:url(src/assets/texture.png);
+  }
   :root {
-    --c-bg: #fbfbfb;
-    --c-fg: #444444;
+    --c-bg: #f1e7e7;
+    --c-fg: #000000;
     --c-scroll: #d9d9d9;
     --c-scroll-hover: #bbbbbb;
     scrollbar-color: var(--c-scrollbar) var(--c-bg);
@@ -52,11 +63,12 @@ const { title } = Astro.props;
     font-family: system-ui, sans-serif;
     background-color: var(--c-bg);
     color: var(--c-fg);
+    background-image:inherit;
   }
 
   html.dark {
-    --c-bg: #212129;
-    --c-fg: #ddddf0;
+    --c-bg: #363434;
+    --c-fg: #ffffff;
     --c-scroll: #333333;
     --c-scroll-hover: #555555;
   }
@@ -66,8 +78,13 @@ const { title } = Astro.props;
     margin: 0 auto;
     padding: 6rem 2rem 4rem;
   }
+
+  .box-shadow-1 {
+    box-shadow: 0 0 6px black;
+  }
+
   .prose {
-    max-width: 100ch;
+    max-width: 100ch !important;
   }
 
   ::-webkit-scrollbar {

@@ -1,5 +1,8 @@
 import { Index, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import { useThrottleFn } from 'solidjs-use'
+import { Button } from '@suid/material'
+import KeyboardArrowUpSharp from '@suid/icons-material/KeyboardArrowUpSharp'
+import KeyboardArrowDownSharp from '@suid/icons-material/KeyboardArrowDownSharp'
 import { generateSignature } from '@/utils/auth'
 import IconClear from './icons/Clear'
 import MessageItem from './MessageItem'
@@ -16,16 +19,18 @@ export default () => {
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal('')
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>(null)
-  const [isStick, setStick] = createSignal(false)
+  const [isStickDown, setStickDown] = createSignal(false)
+  const [isStickUp, setStickUp] = createSignal(false)
+  // const [backgroundColor, setBackgroundColor] = createSignal(false)
 
-  createEffect(() => (isStick() && smoothToBottom()))
+  createEffect(() => (isStickDown() && smoothToBottom()))
 
   onMount(() => {
     let lastPostion = window.scrollY
 
     window.addEventListener('scroll', () => {
       const nowPostion = window.scrollY
-      nowPostion < lastPostion && setStick(false)
+      nowPostion < lastPostion && setStickDown(false)
       lastPostion = nowPostion
     })
 
@@ -37,7 +42,7 @@ export default () => {
         setCurrentSystemRoleSettings(localStorage.getItem('systemRoleSettings'))
 
       if (localStorage.getItem('stickToBottom') === 'stick')
-        setStick(true)
+        setStickDown(true)
     } catch (err) {
       console.error(err)
     }
@@ -51,7 +56,7 @@ export default () => {
   const handleBeforeUnload = () => {
     localStorage.setItem('messageList', JSON.stringify(messageList()))
     localStorage.setItem('systemRoleSettings', currentSystemRoleSettings())
-    isStick() ? localStorage.setItem('stickToBottom', 'stick') : localStorage.removeItem('stickToBottom')
+    isStickDown() ? localStorage.setItem('stickToBottom', 'stick') : localStorage.removeItem('stickToBottom')
   }
 
   const handleButtonClick = async() => {
@@ -73,7 +78,11 @@ export default () => {
 
   const smoothToBottom = useThrottleFn(() => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-  }, 300, false, true)
+  }, 600, false, true)
+
+  const smoothToTop = useThrottleFn(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, 600, false, true)
 
   const instantToBottom = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' })
@@ -132,9 +141,10 @@ export default () => {
           if (char)
             setCurrentAssistantMessage(currentAssistantMessage() + char)
 
-          isStick() && instantToBottom()
+          isStickDown() && instantToBottom()
         }
         done = readerDone
+        smoothToBottom() // 生成下文时自动下滑
       }
     } catch (e) {
       console.error(e)
@@ -143,7 +153,7 @@ export default () => {
       return
     }
     archiveCurrentMessage()
-    isStick() && instantToBottom()
+    isStickDown() && instantToBottom()
   }
 
   const archiveCurrentMessage = () => {
@@ -157,6 +167,7 @@ export default () => {
       ])
       setCurrentAssistantMessage('')
       setLoading(false)
+      smoothToBottom() // loading end trigger roll
       setController(null)
       inputRef.focus()
     }
@@ -196,9 +207,20 @@ export default () => {
       handleButtonClick()
     }
   }
+  // const setTheme = (color: String) => {
+  //   console.log(color)
+  // }
+  const btnProps = {
+    href: 'https://intro.flamestart.top/',
+    target: '_blank',
+  }
 
   return (
     <div my-6>
+      {/* <SetThme backgroundColor={backgroundColor} setBackgroundColor={setBackgroundColor} /> */}
+      <Button variant="outlined" style={{ width: '100%', height: '100px' }} {...btnProps}>
+        Intro
+      </Button>
       <SystemRoleSettings
         canEdit={() => messageList().length === 0}
         systemRoleEditing={systemRoleEditing}
@@ -255,10 +277,17 @@ export default () => {
           </button>
         </div>
       </Show>
-      <div class="fixed bottom-5 left-5 rounded-md hover:bg-slate/10 w-fit h-fit transition-colors active:scale-90" class:stick-btn-on={isStick()}>
+      <div class="fixed bottom-20 right-5 rounded-md hover:bg-slate/10 w-fit h-fit transition-colors active:scale-90">
         <div>
-          <button class="p-2.5 text-base" title="stick to bottom" type="button" onClick={() => setStick(!isStick())}>
-            <div i-ph-arrow-line-down-bold />
+          <button class="p-2.5 text-base" title="stick to bottom" type="button" onClick={smoothToTop}>
+            <KeyboardArrowUpSharp />
+          </button>
+        </div>
+      </div>
+      <div class="fixed bottom-5 right-5 rounded-md w-fit hover:bg-slate/10 h-fit transition-colors active:scale-90" class:stick-btn-on={isStickDown()}>
+        <div>
+          <button class="p-2.5 text-base" title="stick to bottom" type="button" onClick={() => setStickDown(!isStickDown())}>
+            <KeyboardArrowDownSharp />
           </button>
         </div>
       </div>

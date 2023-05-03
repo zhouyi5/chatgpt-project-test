@@ -1,12 +1,23 @@
 {
   "extends": "astro/tsconfigs/base",
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "isolatedModules": true,
     "baseUrl": ".",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite-plugin-pwa/info"],
+    "types": [
+      "vite-plugin-pwa/info","vite/client"
+    ],
     "paths": {
-      "@/*": ["src/*"],
-    },
+      "@/*": [
+        "src/*"
+      ]
+    }
   }
 }
